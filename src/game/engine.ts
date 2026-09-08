@@ -538,6 +538,8 @@ export function createEngine(
   }
 
   function resetRun(play: boolean) {
+    const fresh = loadSave();
+    best = Math.max(best, fresh.best);
     rng = mulberry32((Math.random() * 0xffffffff) | 0);
     player.x = 0;
     player.y = 0;
@@ -689,6 +691,11 @@ export function createEngine(
 
     distance = Math.max(distance, -player.z);
     score = Math.floor(distance) + gifts * 25;
+    if (score > best) {
+      best = score;
+      newBest = true;
+      writeBest(best);
+    }
     player.roll += (steer * 0.42 - player.roll) * (1 - Math.exp(-12 * dt));
 
     const spacing = 17.5 - t * 7.5;

@@ -1,4 +1,4 @@
-# Chassu Rider v1.0.0
+# Chassu Rider v1.1.0
 
 Endless downhill sled from Playadda. Steer the slope, jump the gaps, dodge pines, rocks, snowmen and rolling snowballs, and grab gifts before the mountain takes you.
 
@@ -26,6 +26,12 @@ location /chassu-rider/ {
     try_files $uri $uri/ /chassu-rider/index.html;
 }
 ```
+
+## Playadda UX
+
+- Version stamp **v1.1.0** on the HUD and title card
+- How to play + **Start** on the same title screen (no extra step)
+- High score always shown; updates live when beaten (`localStorage`)
 
 ## Play
 

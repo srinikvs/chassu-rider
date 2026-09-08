@@ -1,4 +1,4 @@
-export const GAME_VERSION = "1.0.0";
+export const GAME_VERSION = "1.1.0";
 
 export type Screen = "title" | "play" | "over";
 
