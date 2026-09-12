@@ -273,7 +273,7 @@ export function createEngine(
   );
   scene.add(flakes);
 
-  const squirrels = createSquirrelPack(scene);
+  const squirrels = createSquirrelPack(scene, () => rng());
 
   function hideInstance(mesh: THREE.InstancedMesh, i: number) {
     dummy.position.set(0, -40, 0);

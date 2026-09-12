@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { Rng } from "./rng";
 
 const PACK = 6;
 const TRAIL = 6.55;
@@ -22,6 +23,7 @@ type Critter = {
   fr: THREE.Mesh;
   hl: THREE.Mesh;
   hr: THREE.Mesh;
+  rust: THREE.MeshLambertMaterial;
   x: number;
   z: number;
   vx: number;
@@ -94,6 +96,7 @@ function buildSquirrel(shared: Shared, tint: number): {
   fr: THREE.Mesh;
   hl: THREE.Mesh;
   hr: THREE.Mesh;
+  rust: THREE.MeshLambertMaterial;
 } {
   const mesh = new THREE.Group();
   const body = new THREE.Group();
@@ -159,43 +162,43 @@ function buildSquirrel(shared: Shared, tint: number): {
   mesh.add(shadow);
 
   mesh.scale.setScalar(1.72);
-  return { mesh, body, tail, fl, fr, hl, hr };
+  return { mesh, body, tail, fl, fr, hl, hr, rust };
 }
 
-function seedVelocity(c: Critter, rider: RiderPose, moving: boolean) {
+function seedVelocity(c: Critter, rider: RiderPose, moving: boolean, rand: Rng) {
   const dash = moving ? Math.max(8, rider.speed) : 5.4;
   if (c.mode === "cross") {
     const dir = c.x >= 0 ? -1 : 1;
-    c.vx = dir * (5.2 + Math.random() * 2.6);
-    c.vz = -dash * (0.1 + Math.random() * 0.22);
+    c.vx = dir * (5.2 + rand() * 2.6);
+    c.vz = -dash * (0.1 + rand() * 0.22);
   } else {
-    const along = Math.random() < 0.45 ? 1.05 : 0.58;
-    c.vx = (Math.random() - 0.5) * 1.4;
+    const along = rand() < 0.45 ? 1.05 : 0.58;
+    c.vx = (rand() - 0.5) * 1.4;
     c.vz = -dash * along;
   }
 }
 
-function placeFresh(c: Critter, rider: RiderPose, moving: boolean, preview: boolean) {
-  c.mode = Math.random() < 0.68 ? "cross" : "edge";
-  c.phase = Math.random() * Math.PI * 2;
+function placeFresh(c: Critter, rider: RiderPose, moving: boolean, preview: boolean, rand: Rng) {
+  c.mode = rand() < 0.68 ? "cross" : "edge";
+  c.phase = rand() * Math.PI * 2;
   c.flee = 0;
   if (preview) {
-    c.z = rider.z + PREVIEW_NEAR - Math.random() * (PREVIEW_NEAR - PREVIEW_FAR);
-    c.x = (Math.random() < 0.5 ? -1 : 1) * (3.2 + Math.random() * 2.6);
+    c.z = rider.z + PREVIEW_NEAR - rand() * (PREVIEW_NEAR - PREVIEW_FAR);
+    c.x = (rand() < 0.5 ? -1 : 1) * (3.2 + rand() * 2.6);
   } else if (moving) {
-    c.z = rider.z - 14 - Math.random() * 22;
+    c.z = rider.z - 14 - rand() * 22;
     c.x = c.mode === "edge"
-      ? (Math.random() < 0.5 ? -1 : 1) * (5.2 + Math.random() * 1.3)
-      : (Math.random() - 0.5) * TRAIL * 1.55;
+      ? (rand() < 0.5 ? -1 : 1) * (5.2 + rand() * 1.3)
+      : (rand() - 0.5) * TRAIL * 1.55;
   } else {
-    c.z = rider.z + PREVIEW_NEAR - Math.random() * 18;
-    c.x = (Math.random() < 0.5 ? -1 : 1) * (3.2 + Math.random() * 2.6);
+    c.z = rider.z + PREVIEW_NEAR - rand() * 18;
+    c.x = (rand() < 0.5 ? -1 : 1) * (3.2 + rand() * 2.6);
   }
-  seedVelocity(c, rider, moving);
+  seedVelocity(c, rider, moving, rand);
   c.yaw = Math.atan2(-c.vx, -c.vz);
 }
 
-export function createSquirrelPack(scene: THREE.Scene): SquirrelPack {
+export function createSquirrelPack(scene: THREE.Scene, rand: Rng): SquirrelPack {
   const shared = makeShared();
   const pack: Critter[] = [];
   for (let i = 0; i < PACK; i++) {
@@ -271,7 +274,7 @@ export function createSquirrelPack(scene: THREE.Scene): SquirrelPack {
       const tooClose = moving && c.z > rider.z - 5;
       const gone = c.z < rider.z - (moving ? 48 : 32);
       const stray = Math.abs(c.x) > 10.2;
-      if (behind || tooClose || gone || stray) placeFresh(c, rider, moving, !moving);
+      if (behind || tooClose || gone || stray) placeFresh(c, rider, moving, !moving, rand);
       pose(c, dt);
     }
   }
@@ -304,14 +307,17 @@ export function createSquirrelPack(scene: THREE.Scene): SquirrelPack {
       c.z = rider.z + slot.z;
       c.phase = i * 1.05;
       c.flee = 0;
-      seedVelocity(c, rider, rider.speed > 1);
+      seedVelocity(c, rider, rider.speed > 1, rand);
       if (c.mode === "cross") c.vx = (c.x >= 0 ? -1 : 1) * (5.4 + i * 0.28);
       pose(c, 0);
     }
   }
 
   function dispose() {
-    for (const c of pack) scene.remove(c.mesh);
+    for (const c of pack) {
+      scene.remove(c.mesh);
+      c.rust.dispose();
+    }
     shared.ball.dispose();
     shared.ear.dispose();
     shared.foot.dispose();
