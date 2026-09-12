@@ -102,7 +102,7 @@ export function ChassuGame() {
                 <h1 className="cr-title">Chassu Rider</h1>
                 <p className="cr-tag">
                   Endless downhill. Dodge pines, rocks, snowmen and gaps. Scoop gifts
-                  before the slope eats you.
+                  before the slope eats you. Snow squirrels keep the trail lively.
                 </p>
                 <div className="cr-hi" aria-live="polite">
                   <span className="cr-hi-label">High score</span>
@@ -122,6 +122,7 @@ export function ChassuGame() {
                     <li>Touch: sides steer, center or swipe up jumps</li>
                     <li>Dodge trees, rocks, snowmen, snowballs, and gaps</li>
                     <li>Collect gifts — they add to your score</li>
+                    <li>Snow squirrels scurry across the slope — they dart away and will not wreck you</li>
                   </ul>
                 </section>
                 <button

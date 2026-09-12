@@ -10,6 +10,7 @@ import {
 } from "./audio";
 import { frand, mulberry32, type Rng } from "./rng";
 import { loadSave, writeBest, writeMuted } from "./save";
+import { createSquirrelPack } from "./squirrels";
 import type { PublicEngine, Screen, UiState } from "./types";
 
 const STEP = 1 / 60;
@@ -271,6 +272,8 @@ export function createEngine(
     new THREE.PointsMaterial({ color: 0xffffff, size: 0.12, transparent: true, opacity: 0.85 }),
   );
   scene.add(flakes);
+
+  const squirrels = createSquirrelPack(scene, () => rng());
 
   function hideInstance(mesh: THREE.InstancedMesh, i: number) {
     dummy.position.set(0, -40, 0);
@@ -570,6 +573,7 @@ export function createEngine(
       sfxStart();
       player.speed = BASE_SPEED;
     }
+    squirrels.reset(player);
     emitUi();
   }
 
@@ -635,6 +639,7 @@ export function createEngine(
         return;
       }
       player.yaw = Math.sin(lastT * 0.00045) * 0.12;
+      squirrels.update(dt, player, false);
       return;
     }
     if (screen === "over") {
@@ -643,6 +648,7 @@ export function createEngine(
       sled.rotation.z += player.spin * dt;
       sled.rotation.x += dt * 1.2;
       player.hop = Math.max(0, player.hop - dt * 3);
+      squirrels.update(dt, player, false);
       if (crashT > 0.4 && startEdge(h)) {
         resetRun(true);
         return;
@@ -776,6 +782,7 @@ export function createEngine(
 
     setWindLevel(0.25 + t * 0.75);
     shake = Math.max(0, shake - dt * 3);
+    squirrels.update(dt, player, true);
     markInstances();
   }
 
@@ -976,6 +983,7 @@ export function createEngine(
       canvas.removeEventListener("pointerup", onPointerUp);
       canvas.removeEventListener("pointercancel", onPointerUp);
       if (window.__controlsTest) delete window.__controlsTest;
+      squirrels.dispose();
       snowTex.dispose();
       renderer.dispose();
       scene.traverse((obj) => {
