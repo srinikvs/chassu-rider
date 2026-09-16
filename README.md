@@ -1,6 +1,6 @@
-# Chassu Rider v1.1.0
+# Chassu Rider v1.2.0
 
-Endless downhill sled from Playadda. Steer the slope, jump the gaps, dodge pines, rocks, snowmen and rolling snowballs, and grab gifts before the mountain takes you.
+Endless downhill sled from Playadda. Steer the slope, jump the gaps, dodge pines, rocks, snowmen and rolling snowballs, and grab gifts before the mountain takes you. Snow squirrels scurry across and along the trail.
 
 ## Run
 
@@ -29,16 +29,17 @@ location /chassu-rider/ {
 
 ## Playadda UX
 
-- Version stamp **v1.1.0** on the HUD and title card
+- Version stamp **v1.2.0** on the HUD and title card
 - How to play + **Start** on the same title screen (no extra step)
 - High score always shown; updates live when beaten (`localStorage`)
+- Ambient snow squirrels on the title slope and during a run (no score or crash)
 
 ## Play
 
 1. **Start** the run. The sled goes downhill on its own.
 2. Steer with **A / D** or the arrow keys. On a phone, hold the left or right half of the screen.
 3. Jump with **W**, **Up**, or **Space**. On a phone, tap the center or swipe up.
-4. Gifts add to your score. Hitting a tree, rock, snowman, snowball, or falling into a gap ends the run.
+4. Gifts add to your score. Hitting a tree, rock, snowman, snowball, or falling into a gap ends the run. Snow squirrels dart away and do not end the run.
 5. Best score is kept in `localStorage`.
 
 ## Stack
