@@ -106,6 +106,9 @@ function buildSquirrel(shared: Shared, tint: number): {
 
   const rust = shared.rust.clone();
   rust.color.offsetHSL(tint * 0.7, 0.02, tint * 0.12);
+  mesh.addEventListener("removed", () => {
+    rust.dispose();
+  });
 
   addBall(body, shared.ball, shared.fur, 0, 0.26, 0, 0.18, 0.16, 0.22);
   addBall(body, shared.ball, rust, 0, 0.34, -0.02, 0.14, 0.09, 0.18);
