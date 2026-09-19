@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import type { Rng } from "./rng";
+import type { SquirrelSnap } from "./types";
 
 const PACK = 6;
 const TRAIL = 6.55;
@@ -37,6 +38,8 @@ type Critter = {
 export type SquirrelPack = {
   update: (dt: number, rider: RiderPose, moving: boolean) => void;
   reset: (rider: RiderPose) => void;
+  snapshot: () => SquirrelSnap[];
+  placeAt: (index: number, x: number, z: number) => void;
   dispose: () => void;
 };
 
@@ -316,6 +319,24 @@ export function createSquirrelPack(scene: THREE.Scene, rand: Rng): SquirrelPack 
     }
   }
 
+  function snapshot(): SquirrelSnap[] {
+    return pack.map((c) => ({
+      x: c.x,
+      z: c.z,
+      visible: c.mesh.visible,
+      flee: c.flee,
+    }));
+  }
+
+  function placeAt(index: number, x: number, z: number) {
+    const c = pack[index];
+    if (!c) return;
+    c.x = x;
+    c.z = z;
+    c.flee = 0;
+    pose(c, 0);
+  }
+
   function dispose() {
     for (const c of pack) {
       scene.remove(c.mesh);
@@ -340,5 +361,5 @@ export function createSquirrelPack(scene: THREE.Scene, rand: Rng): SquirrelPack 
     }
   }
 
-  return { update, reset, dispose };
+  return { update, reset, snapshot, placeAt, dispose };
 }

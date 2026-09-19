@@ -945,6 +945,15 @@ export function createEngine(
   window.__controlsTest = {
     getYaw: () => player.yaw,
     getSpeed: () => player.speed,
+    getScreen: () => screen,
+    getScore: () => score,
+    getDistance: () => distance,
+    getBest: () => best,
+    getGifts: () => gifts,
+    getSquirrels: () => squirrels.snapshot(),
+    overlapSquirrel: () => {
+      squirrels.placeAt(0, player.x, player.z);
+    },
     setSteer: (v) => {
       qaSteer = v;
     },

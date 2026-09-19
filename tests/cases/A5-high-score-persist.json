@@ -1,0 +1,15 @@
+{
+  "id": "A5",
+  "layer": "unit",
+  "title": "High-score persist: beating Best writes chassu-rider-v1; a lower score does not overwrite",
+  "gate": "optional",
+  "steps": [
+    { "op": "persistBest", "priorBest": 10, "score": 42 },
+    { "op": "expect", "assert": "highScore", "value": 42 },
+    { "op": "persistBest", "priorBest": 80, "score": 12 }
+  ],
+  "expect": [
+    { "assert": "highScore", "value": 80 },
+    { "assert": "savePresent", "value": true }
+  ]
+}

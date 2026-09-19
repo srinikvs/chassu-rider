@@ -17,6 +17,13 @@ npm run build
 npm run preview
 ```
 
+Automated tests (JSON cases under `tests/cases/`) are documented in [TESTING.md](TESTING.md):
+
+```bash
+npm test
+npm run test:e2e
+```
+
 Production assets are built with base `/chassu-rider/` to match the Playadda path `https://playadda.duckdns.org/chassu-rider/`.
 
 Serve the SPA so client paths do not 404:

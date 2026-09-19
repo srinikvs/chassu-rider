@@ -21,6 +21,7 @@ export function ChassuGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<PublicEngine | null>(null);
   const [ui, setUi] = useState<UiState>(emptyUi);
+  const [engineReady, setEngineReady] = useState(false);
 
   useEffect(() => {
     const saved = loadSave();
@@ -38,6 +39,7 @@ export function ChassuGame() {
       if (cancelled) return;
       engine = createEngine(canvas, setUi);
       engineRef.current = engine;
+      setEngineReady(true);
     });
     return () => {
       cancelled = true;
@@ -50,13 +52,13 @@ export function ChassuGame() {
   const overlay = ui.screen === "title" || ui.screen === "over";
 
   return (
-    <div className="cr-shell">
-      <canvas ref={canvasRef} className="cr-canvas" />
+    <div className="cr-shell" data-testid="app" data-engine={engineReady ? "ready" : "boot"}>
+      <canvas ref={canvasRef} className="cr-canvas" data-testid="board" />
 
-      <header className={`cr-hud${play ? "" : " cr-hud-quiet"}`}>
+      <header className={`cr-hud${play ? "" : " cr-hud-quiet"}`} data-testid="hud">
         <div className="cr-brand">
           <span className="cr-wordmark">Chassu Rider</span>
-          <span className="cr-ver-badge" aria-label={`Version ${GAME_VERSION}`}>
+          <span className="cr-ver-badge" data-testid="version" aria-label={`Version ${GAME_VERSION}`}>
             v{GAME_VERSION}
           </span>
         </div>
@@ -65,22 +67,29 @@ export function ChassuGame() {
             <>
               <span className="cr-stat">
                 <span className="cr-stat-label">Dist</span>
-                <span className="cr-stat-value">{fmt(ui.distance)}m</span>
+                <span className="cr-stat-value" data-testid="distance">
+                  {fmt(ui.distance)}m
+                </span>
               </span>
               <span className="cr-stat">
                 <Gift className="cr-ico" aria-hidden />
-                <span className="cr-stat-value">{fmt(ui.gifts)}</span>
+                <span className="cr-stat-value" data-testid="gifts">
+                  {fmt(ui.gifts)}
+                </span>
               </span>
             </>
           )}
           <span className={`cr-stat${ui.newBest && play ? " cr-stat-hot" : ""}`}>
             <span className="cr-stat-label">Best</span>
-            <span className="cr-stat-value">{fmt(ui.best)}</span>
+            <span className="cr-stat-value" data-testid="best">
+              {fmt(ui.best)}
+            </span>
           </span>
         </div>
         <button
           type="button"
           className="cr-icon-btn"
+          data-testid="mute"
           aria-label={ui.muted ? "Unmute" : "Mute"}
           onClick={() => engineRef.current?.toggleMute()}
         >
@@ -89,13 +98,13 @@ export function ChassuGame() {
       </header>
 
       {overlay && (
-        <div className="cr-veil">
-          <div className="cr-card">
+        <div className="cr-veil" data-testid="start-screen">
+          <div className="cr-card" data-testid="start-panel">
             {ui.screen === "title" ? (
               <>
                 <div className="cr-card-head">
                   <p className="cr-kicker">Playadda</p>
-                  <span className="cr-ver-badge" aria-label={`Version ${GAME_VERSION}`}>
+                  <span className="cr-ver-badge" data-testid="start-version" aria-label={`Version ${GAME_VERSION}`}>
                     v{GAME_VERSION}
                   </span>
                 </div>
@@ -106,9 +115,11 @@ export function ChassuGame() {
                 </p>
                 <div className="cr-hi" aria-live="polite">
                   <span className="cr-hi-label">High score</span>
-                  <span className="cr-hi-value">{fmt(ui.best)}</span>
+                  <span className="cr-hi-value" data-testid="high-score">
+                    {fmt(ui.best)}
+                  </span>
                 </div>
-                <section className="cr-howto" aria-labelledby="cr-howto-title">
+                <section className="cr-howto" data-testid="howto" aria-labelledby="cr-howto-title">
                   <h2 id="cr-howto-title" className="cr-howto-title">
                     How to play
                   </h2>
@@ -128,6 +139,7 @@ export function ChassuGame() {
                 <button
                   type="button"
                   className="cr-cta"
+                  data-testid="start"
                   onClick={() => engineRef.current?.start()}
                 >
                   Start
@@ -137,7 +149,7 @@ export function ChassuGame() {
               <>
                 <div className="cr-card-head">
                   <p className="cr-kicker">{ui.newBest ? "New best" : "Wrecked"}</p>
-                  <span className="cr-ver-badge" aria-label={`Version ${GAME_VERSION}`}>
+                  <span className="cr-ver-badge" data-testid="start-version" aria-label={`Version ${GAME_VERSION}`}>
                     v{GAME_VERSION}
                   </span>
                 </div>
@@ -163,6 +175,7 @@ export function ChassuGame() {
                 <button
                   type="button"
                   className="cr-cta"
+                  data-testid="start"
                   onClick={() => engineRef.current?.restart()}
                 >
                   Start

@@ -1,0 +1,12 @@
+{
+  "id": "A6",
+  "layer": "unit",
+  "title": "Version string present in package.json, HTML title, and UI constant",
+  "gate": "optional",
+  "steps": [{ "op": "readVersionSources" }],
+  "expect": [
+    { "assert": "versionMatchesPackage" },
+    { "assert": "htmlHasVersionTag", "file": "index.html" },
+    { "assert": "uiUsesVersionLabel", "file": "src/game/Game.tsx" }
+  ]
+}

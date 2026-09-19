@@ -1,0 +1,19 @@
+{
+  "id": "B10",
+  "layer": "e2e",
+  "title": "After Start the sled rides: distance and speed increase",
+  "gate": "block",
+  "steps": [
+    { "op": "openFresh" },
+    { "op": "click", "testId": "start" },
+    { "op": "waitVisible", "testId": "distance" },
+    { "op": "waitRide", "ms": 700 },
+    { "op": "steer", "dir": "left", "ms": 250 }
+  ],
+  "expect": [
+    { "assert": "visible", "testId": "hud" },
+    { "assert": "hidden", "testId": "start" },
+    { "assert": "riding" },
+    { "assert": "speedPositive" }
+  ]
+}

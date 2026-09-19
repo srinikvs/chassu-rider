@@ -1,0 +1,11 @@
+{
+  "id": "A7",
+  "layer": "unit",
+  "title": "Snow squirrels are ambient: they flee and are not a crash or score kind",
+  "gate": "optional",
+  "steps": [{ "op": "assertSquirrelAmbient" }],
+  "expect": [
+    { "assert": "squirrelsNotCrashKind" },
+    { "assert": "squirrelsFlee" }
+  ]
+}

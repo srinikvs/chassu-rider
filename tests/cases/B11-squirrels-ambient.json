@@ -1,0 +1,19 @@
+{
+  "id": "B11",
+  "layer": "e2e",
+  "title": "Ambient snow squirrels stay visible and do not wreck or score",
+  "gate": "optional",
+  "steps": [
+    { "op": "openFresh" },
+    { "op": "waitProbe", "need": "squirrels" },
+    { "op": "expect", "assert": "squirrelsVisible", "min": 1 },
+    { "op": "click", "testId": "start" },
+    { "op": "waitVisible", "testId": "distance" },
+    { "op": "overlapSquirrel" }
+  ],
+  "expect": [
+    { "assert": "squirrelsVisible", "min": 1 },
+    { "assert": "screen", "value": "play" },
+    { "assert": "giftsUnchanged" }
+  ]
+}

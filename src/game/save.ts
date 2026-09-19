@@ -1,4 +1,4 @@
-const KEY = "chassu-rider-v1";
+export const STORAGE_KEY = "chassu-rider-v1";
 const SAVE_VERSION = 1;
 
 export type SaveData = {
@@ -19,7 +19,7 @@ function migrate(raw: Partial<SaveData> & { version?: number }): SaveData {
 
 export function loadSave(): SaveData {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return { ...defaults };
     const parsed = JSON.parse(raw) as Partial<SaveData>;
     return migrate(parsed);
@@ -30,7 +30,7 @@ export function loadSave(): SaveData {
 
 export function writeSave(next: SaveData): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify({ ...next, version: SAVE_VERSION }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...next, version: SAVE_VERSION }));
   } catch {
     /* private mode / quota */
   }

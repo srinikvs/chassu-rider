@@ -1,0 +1,17 @@
+{
+  "id": "B7",
+  "layer": "e2e",
+  "title": "First load: how-to-play and Start on the same screen",
+  "gate": "block",
+  "steps": [{ "op": "openFresh" }],
+  "expect": [
+    { "assert": "visible", "testId": "start-screen" },
+    { "assert": "visible", "testId": "start-panel" },
+    { "assert": "visible", "testId": "howto" },
+    { "assert": "count", "testId": "howto", "selector": "li", "value": 6 },
+    { "assert": "visible", "testId": "start" },
+    { "assert": "visible", "testId": "version" },
+    { "assert": "heading", "name": "Chassu Rider" },
+    { "assert": "below", "above": "howto", "below": "start" }
+  ]
+}
