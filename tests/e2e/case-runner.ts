@@ -3,6 +3,7 @@ import type { CaseFile, Expectation, Step } from "../cases/types.ts";
 import {
   RemoteHookSkip,
   clickStart,
+  hasProbe,
   hasRideProbe,
   hasSquirrelProbe,
   isRemoteBase,
