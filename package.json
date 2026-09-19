@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "tsx --test src/game/*.test.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:pixel": "playwright test --project=pixel"
   },
   "dependencies": {
     "lucide-react": "^0.510.0",
@@ -15,11 +18,13 @@
     "three": "^0.170.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@types/node": "^22.16.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.170.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "tsx": "^4.19.2",
     "typescript": "~5.7.2",
     "vite": "^6.0.0"
   }

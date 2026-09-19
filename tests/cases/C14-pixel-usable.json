@@ -1,0 +1,34 @@
+{
+  "id": "C14",
+  "layer": "pixel",
+  "title": "Pixel 412×915: HUD, how-to, Start, and slope usable without critical clip",
+  "gate": "block",
+  "steps": [
+    { "op": "openFresh" },
+    { "op": "expect", "assert": "viewport", "width": 412, "height": 915 },
+    { "op": "expect", "assert": "visible", "testId": "hud" },
+    { "op": "expect", "assert": "visible", "testId": "howto" },
+    { "op": "expect", "assert": "visible", "testId": "start" },
+    { "op": "expect", "assert": "visible", "testId": "board" },
+    {
+      "op": "expect",
+      "assert": "noVerticalClip",
+      "testId": ["hud", "howto", "start", "version"]
+    },
+    { "op": "click", "testId": "start" },
+    { "op": "waitVisible", "testId": "distance" },
+    { "op": "emulateSafeArea", "sat": 24, "sab": 34 }
+  ],
+  "expect": [
+    { "assert": "viewport", "width": 412, "height": 915 },
+    { "assert": "visible", "testId": "hud" },
+    { "assert": "visible", "testId": "board" },
+    { "assert": "visible", "testId": "version" },
+    {
+      "assert": "noVerticalClip",
+      "testId": ["hud", "board", "version", "mute"]
+    },
+    { "assert": "boardUsable", "minWidth": 300, "minHeight": 500 },
+    { "assert": "controlsAboveHomeBar", "sab": 34, "testId": ["hud", "mute"] }
+  ]
+}

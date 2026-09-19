@@ -19,9 +19,23 @@ export type PublicEngine = {
   destroy: () => void;
 };
 
+export type SquirrelSnap = {
+  x: number;
+  z: number;
+  visible: boolean;
+  flee: number;
+};
+
 export type ControlsProbe = {
   getYaw: () => number;
   getSpeed: () => number;
+  getScreen: () => Screen;
+  getScore: () => number;
+  getDistance: () => number;
+  getBest: () => number;
+  getGifts: () => number;
+  getSquirrels: () => SquirrelSnap[];
+  overlapSquirrel: () => void;
   setSteer?: (v: number) => void;
   setKeys?: (codes: string[]) => void;
 };
