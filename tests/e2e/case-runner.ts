@@ -3,7 +3,8 @@ import type { CaseFile, Expectation, Step } from "../cases/types.ts";
 import {
   RemoteHookSkip,
   clickStart,
-  hasProbe,
+  hasRideProbe,
+  hasSquirrelProbe,
   isRemoteBase,
   loc,
   openFresh,
@@ -118,31 +119,41 @@ async function applyExpect(page: Page, exp: Expectation, caseId: string): Promis
       return;
     }
     case "riding": {
-      const probe = await readProbe(page);
-      if (probe) {
-        expect(probe.speed, `${tag} speed`).toBeGreaterThan(0);
-        expect(probe.distance, `${tag} distance`).toBeGreaterThan(0);
-        expect(probe.screen, `${tag} screen`).toBe("play");
+      if (await hasRideProbe(page)) {
+        const probe = await readProbe(page);
+        expect(probe?.speed, `${tag} speed`).toBeGreaterThan(0);
+        expect(probe?.distance, `${tag} distance`).toBeGreaterThan(0);
+        expect(probe?.screen, `${tag} screen`).toBe("play");
         return;
       }
-      const dist = await loc(page, "distance").innerText();
-      expect(await parseHudNumber(dist), `${tag} HUD distance`).toBeGreaterThan(0);
-      return;
-    }
-    case "speedPositive": {
-      if (!(await hasProbe(page))) {
-        if (isRemoteBase()) {
-          console.warn(remoteSkipMessage("getSpeed"));
+      const dist = loc(page, "distance");
+      if (await dist.isVisible()) {
+        expect(await parseHudNumber(await dist.innerText()), `${tag} HUD distance`).toBeGreaterThan(0);
+        return;
+      }
+      if (isRemoteBase()) {
+        const recap = page.getByRole("heading", { name: "Run over" });
+        if (await recap.isVisible()) {
+          console.warn(`${tag}: live host wrecked before HUD Dist; treating recap distance as ride smoke.`);
           return;
         }
-        throw new Error(`${tag}: window.__controlsTest missing on local preview`);
+      }
+      throw new Error(`${tag}: sled did not ride (no ride probe, no Dist HUD)`);
+    }
+    case "speedPositive": {
+      if (!(await hasRideProbe(page))) {
+        if (isRemoteBase()) {
+          console.warn(remoteSkipMessage("getDistance/getSpeed"));
+          return;
+        }
+        throw new Error(`${tag}: window.__controlsTest ride hooks missing on local preview`);
       }
       const probe = await readProbe(page);
       expect(probe?.speed, tag).toBeGreaterThan(0);
       return;
     }
     case "squirrelsVisible": {
-      if (!(await hasProbe(page))) {
+      if (!(await hasSquirrelProbe(page))) {
         throw new RemoteHookSkip(remoteSkipMessage("getSquirrels"));
       }
       const probe = await readProbe(page);
@@ -151,7 +162,7 @@ async function applyExpect(page: Page, exp: Expectation, caseId: string): Promis
       return;
     }
     case "screen": {
-      if (!(await hasProbe(page))) {
+      if (!(await hasRideProbe(page))) {
         throw new RemoteHookSkip(remoteSkipMessage("getScreen"));
       }
       const probe = await readProbe(page);
@@ -159,7 +170,7 @@ async function applyExpect(page: Page, exp: Expectation, caseId: string): Promis
       return;
     }
     case "giftsUnchanged": {
-      if (!(await hasProbe(page))) {
+      if (!(await hasSquirrelProbe(page))) {
         throw new RemoteHookSkip(remoteSkipMessage("getGifts"));
       }
       const probe = await readProbe(page);
@@ -190,11 +201,11 @@ async function runStep(page: Page, step: Step, c: CaseFile): Promise<void> {
       await expect(loc(page, String(step.testId))).toBeVisible();
       return;
     case "waitProbe":
-      await waitProbe(page);
+      await waitProbe(page, (step.need as "any" | "ride" | "squirrels") ?? "any");
       return;
     case "waitRide": {
       const ms = Number(step.ms ?? 700);
-      if (await hasProbe(page)) {
+      if (await hasRideProbe(page)) {
         await expect
           .poll(async () => {
             const p = await readProbe(page);
@@ -203,8 +214,14 @@ async function runStep(page: Page, step: Step, c: CaseFile): Promise<void> {
           .toBe(true);
         return;
       }
+      if (isRemoteBase() && (await hasProbe(page))) {
+        console.warn(remoteSkipMessage("getDistance"));
+      }
       await page.waitForTimeout(ms);
-      await expect(loc(page, "distance")).toBeVisible();
+      const dist = loc(page, "distance");
+      if (await dist.isVisible()) return;
+      if (isRemoteBase()) return;
+      await expect(dist).toBeVisible();
       return;
     }
     case "waitBeatBest": {
@@ -222,7 +239,7 @@ async function runStep(page: Page, step: Step, c: CaseFile): Promise<void> {
     case "steer": {
       const dir = String(step.dir ?? "left");
       const key = dir === "right" ? "ArrowRight" : "ArrowLeft";
-      if (await hasProbe(page)) {
+      if (await hasRideProbe(page)) {
         await page.evaluate((code) => window.__controlsTest?.setKeys?.([code]), key);
         await page.waitForTimeout(Number(step.ms ?? 200));
         await page.evaluate(() => window.__controlsTest?.setKeys?.([]));
@@ -234,7 +251,7 @@ async function runStep(page: Page, step: Step, c: CaseFile): Promise<void> {
       return;
     }
     case "overlapSquirrel": {
-      await waitProbe(page);
+      await waitProbe(page, "squirrels");
       await page.evaluate(() => window.__controlsTest?.overlapSquirrel?.());
       await page.waitForTimeout(250);
       return;

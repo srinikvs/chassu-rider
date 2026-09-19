@@ -58,7 +58,7 @@ BASE_URL=https://playaddatest.duckdns.org/chassu-rider/ npm run test:e2e
 BASE_URL=https://playadda.duckdns.org/chassu-rider/ npm run test:e2e
 ```
 
-Cases that only need DOM (How-to + Start, version text, high-score `localStorage`, ride smoke via Dist HUD, pixel clip) fall back to CSS / role locators. Cases that need `window.__controlsTest` (squirrel overlap, probe speed when HUD is missing) **skip** on a live `BASE_URL` with a clear message:
+Cases that only need DOM (How-to + Start, version text, high-score `localStorage`, ride smoke via Dist HUD, pixel clip) fall back to CSS / role locators. A live host may expose a **partial** `window.__controlsTest` (for example `getSpeed` without `getDistance` / `getSquirrels`). Ride smoke then uses the Dist HUD; squirrel overlap **skips** with a clear message:
 
 `BASE_URL <host> lacks test hooks (…). Local preview remains the CI gate.`
 

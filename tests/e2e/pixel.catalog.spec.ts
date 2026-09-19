@@ -13,6 +13,7 @@ for (const c of casesForPlaywrightProject("pixel")) {
       if (err instanceof RemoteHookSkip) {
         console.warn(err.message);
         test.skip(true, err.message);
+        return;
       }
       throw err;
     }

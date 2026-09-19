@@ -59,8 +59,34 @@ export function loc(page: Page, testId: string): Locator {
   return page.getByTestId(testId).or(fallbackLocator(page, testId)).first();
 }
 
+export type ProbeCaps = {
+  any: boolean;
+  ride: boolean;
+  squirrels: boolean;
+};
+
+export async function probeCaps(page: Page): Promise<ProbeCaps> {
+  return page.evaluate(() => {
+    const p = window.__controlsTest;
+    if (!p) return { any: false, ride: false, squirrels: false };
+    return {
+      any: true,
+      ride: typeof p.getSpeed === "function" && typeof p.getDistance === "function",
+      squirrels: typeof p.getSquirrels === "function",
+    };
+  });
+}
+
 export async function hasProbe(page: Page): Promise<boolean> {
-  return page.evaluate(() => Boolean(window.__controlsTest && typeof window.__controlsTest.getSpeed === "function"));
+  return (await probeCaps(page)).any;
+}
+
+export async function hasRideProbe(page: Page): Promise<boolean> {
+  return (await probeCaps(page)).ride;
+}
+
+export async function hasSquirrelProbe(page: Page): Promise<boolean> {
+  return (await probeCaps(page)).squirrels;
 }
 
 export async function waitForGame(page: Page): Promise<void> {
@@ -111,12 +137,18 @@ export async function readSave(page: Page): Promise<SaveBlob | null> {
   }, STORAGE_KEY);
 }
 
-export async function waitProbe(page: Page): Promise<void> {
-  if (await hasProbe(page)) return;
+export async function waitProbe(page: Page, need: "any" | "ride" | "squirrels" = "any"): Promise<void> {
+  const ready = async () => {
+    const caps = await probeCaps(page);
+    if (need === "ride") return caps.ride;
+    if (need === "squirrels") return caps.squirrels;
+    return caps.any;
+  };
+  if (await ready()) return;
   if (isRemoteBase()) {
-    throw new RemoteHookSkip(remoteSkipMessage("window.__controlsTest"));
+    throw new RemoteHookSkip(remoteSkipMessage(`window.__controlsTest ${need}`));
   }
-  await expect.poll(async () => hasProbe(page), { timeout: 12_000 }).toBe(true);
+  await expect.poll(ready, { timeout: 12_000 }).toBe(true);
 }
 
 export async function readProbe(page: Page): Promise<{

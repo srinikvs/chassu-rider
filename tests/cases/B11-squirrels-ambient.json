@@ -5,7 +5,7 @@
   "gate": "optional",
   "steps": [
     { "op": "openFresh" },
-    { "op": "waitProbe" },
+    { "op": "waitProbe", "need": "squirrels" },
     { "op": "expect", "assert": "squirrelsVisible", "min": 1 },
     { "op": "click", "testId": "start" },
     { "op": "waitVisible", "testId": "distance" },
